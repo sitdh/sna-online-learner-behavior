@@ -56,12 +56,12 @@ WITH row, SPLIT(TRIM(row.`children`), " ") AS children
 MATCH (c:Course {course_id: row.`course_id`})
 MERGE (m:Module {module_id: row.`module_id`, category: row.`category`, start_date: row.`start`})
 
-CREATE (c)<-[:PART_OF]-(m)
+CREATE (c)-[:HAS]->(m)
 
 WITH m, children
 UNWIND children AS k
     MERGE (o:ModuleObject {object_id: k})
-    CREATE (m)<-[:PART_OF]-(o);
+    CREATE (m)-[:CONTAIN]->(o);
 ```
 
 
