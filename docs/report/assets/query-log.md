@@ -132,3 +132,16 @@ CALL gds.graph.create.cypher(
     'MATCH (n)-[r]->(m) RETURN id(n) AS source, id(m) AS target, type(r) AS type'
 )
 ```
+
+# Node counting
+## All learner
+```
+MATCH (l:Learner)-[r]->(e:Enrollment)
+RETURN COUNT(DISTINCT l)
+```
+
+## Dropout learner
+```
+MATCH (l:Learner)-[r]->(e:Enrollment {learning_status: "dropout"})
+RETURN COUNT(DISTINCT l)
+```
