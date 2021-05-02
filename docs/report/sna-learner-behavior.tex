@@ -9,6 +9,8 @@
 \usepackage{textcomp}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage{pgfplots} 
+\usepackage{pgf-pie}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
@@ -60,7 +62,15 @@
     \maketitle
 
     \begin{abstract}
-        Lorem ipsum
+        การระบาดของไวรัสโควิดนั่นส่งผลให้หลายกิจกรรมต้องปรับเปลี่ยนการดำเนินกิจกรรมให้เข้ากับสถานการณ์
+        ซึ่งการเรียนการสอนที่จำเป็นจะต้องร่วมกลุ่มกันในห้องเรียนนั้นจึงต้องปรับเปลี่ยนลักษณะการเรียนการสอนให้เข้ากับสถานการณ์ด้วยเช่นกัน
+        โดยปรับให้การเรียนการสอนนั้นกลายเป็นห้องเรียนเสมือนในที่สุด แต่จากผลการสึกษษานั้น 
+        พบว่าผู้เรียนผ่าน{\MOOCs}นั้นมีเพียง 5\% เท่านั้นที่สามารถเรียนจนครบหลักสูตร \cite{Feng_Tang_Liu_2019}
+        หรือกว่า 95\% ของผู้เรียนนั้นต้องยุติการเรียนกลางคัน ดังนั้นหากสามารถตรวจจับลักษณะของผู้ใช้งานที่มีแนวโน้มจะยุติกลางคัน
+        และแจ้งเตือนผู้เกี่ยวข้อง เช่นผู้สอน ผู้ปกครอง เพื่อกระตุ้นผู้เรียนให้กลับเข้ามามีปฏิสัมพันธ์กับหลักสูตรเช่นเดิมได้
+        ย่อมส่งผลดีให้กับผู้เรียนได้เรียนจนครบเป้าหมายของหลักสูตรที่ได้กำหนดไว้ ซึ่งจากการศึกษาพฤติกรรมร่วมของผู้เรียนบน{\MOOCs} 
+        ที่ถูกระบุว่า{\dropout} ด้วยการหากลุ่มพฤติกรรมด้วยวิธีการทางกราฟ พบว่า 
+        ผู้เรียนที่ทำแบบทดสอบซ้ำๆ กันหลายครั้งต่อเนื่องกันนั้นมีแนวโน้มที่จะ{\dropout}ไปในที่สุด \footnote{ชุดข้อมูลการศึกษาสามารถเข้าถึงได้ที่ https://github.com/sitdh/sna-online-learner-behavior}
     \end{abstract}
 
     \begin{IEEEkeywords}
@@ -337,8 +347,9 @@
         \item โหนด \textbf{Learner} จะเกิดความสัมพันธ์ไปยังโหนด \textbf{Enrollment} ด้วยความสัมพันธ์แบบ \textbf{:PERFORMED} เพื่อแสดงถึงการลงทะเบียนเรียน
         \item โหนด \textbf{Enrollment} มีความสัมพันธ์กับโหนด \textbf{Event} และ \textbf{Course} ด้วยความสัมพันธ์แบบ \textbf{:ACTION} และ \textbf{:ENROLL} ตามลำดับ
         \item โหนด \textbf{Event} ที่ใช้แทนปฏิสัมพันธ์ที่เกิดขึ้นกับเนื้อหาในหลักสูตรนั้นจะมีความสัมพันธ์แบบ \textbf{:PARTICIPATE} ไปยังโหนด \textbf{Module} และ \textbf{ModuleObject}
+        \item โหนด \textbf{Module} แทนกลุ่มเนื้อหาในกลักสูตรใน{\MOOCs} ที่ใช้จัดเก็บข้อมูลเพื่อศึกษา จะสร้างความสัมพันธ์ไปยังโหนด \textbf{COURSE} เพื่อสร้างโครงสร้างเนื้อหาที่อยู่ภายใต้หลักสูตรด้วยความสัมพันธ์ชื่อ \textbf{:PART\_OF}
+        \item โหนด \textbf{ModuleObject} แทนส่วนประกอบย่อยในกลุ่มเนื้อหาหลักสูตรในโหนด \textbf{Moodule} โดยสร้างความสัมพันธ์ไปยัง
         \item โหนด \textbf{Course} แทนหลักสูตรใน{\MOOCs} ที่ใช้จัดเก็บข้อมูลเพื่อศึกษา จะสร้างความสัมพันธ์ไปยังโหนด \textbf{Module} เพื่อสร้างโครงสร้างเนื้อหาที่อยู่ภายใต้หลักสูตรด้วยความสัมพันธ์ชื่อ \textbf{:HAS}
-        \item โหนด \textbf{ModuleObject} แทนส่วนประกอบย่อย
     \end{itemize}
 
     จากนั้นจึงนำเข้าชุดข้อมูลเข้าสู่ฐานข้อมูลกราฟ ซึ่งจะได้โครงสร้างดังรูปที่ \ref{fig:graph-modeling}
@@ -350,7 +361,10 @@
         \label{fig:graph-modeling}
     \end{figure}
 
-    ซึ่งจากการเรียกดูข้อมูลพบว่า มีโหนดในฐานข้อมูลทั้งสิ้นรวม 5,434,977 โหนด โดยแบ่งออกเป็น 
+    ซึ่งจากการเรียกดูข้อมูลพบว่า มีโหนดในฐานข้อมูลทั้งสิ้นรวม 5,434,977 โหนด 
+    โดยแบ่งออกเป็นโหนดต่างๆ ได้แก่ Course, Enrollment, Learner, Module,
+    ModuleObject, Event ดังที่แสดงไว้ในตารางที่ \ref{tab:node-details}
+
     % MATCH (n) 
     % RETURN DISTINCT count(labels(n)) AS node_count, labels(n)[0] AS node_name;
     \begin{table}[ht!]
@@ -370,17 +384,154 @@
         \end{tabular}
     \end{table}
 
+    \section[result]{ผลลัพธ์การดำเนินงาน}
+
     % MATCH (e:Enrollment {learning_status: "dropout"})
     % RETURN COUNT(e) AS total_dropout;
-    โดยสิ่งที่น่าสนใจคือ จากจำนวนผู้เรียนที่ลงทะเบียนเรียนทั้งสิ้น 72,395 ครั้ง 
+    สิ่งที่น่าสนใจคือ จากจำนวนผู้เรียนที่ลงทะเบียนเรียนทั้งสิ้น 72,395 ครั้ง 
     ดังที่แสดงไว้ในตารางที่ \ref{tab:node-details} แล้วนั้น พบว่าเกิด{\dropout}ไปทั้งสิ้น
-    57,366 รายการ หรือคิดเป็น 79.24\% ของข้อมูลการลงทะเบียนในชุดข้อมูลนี้
+    57,366 รายการ หรือคิดเป็น 79.24\% ของข้อมูลการลงทะเบียนในชุดข้อมูลนี้ โดยพบว่า
+    กิจกรรมของผู้เรียนนั้นมีเพียง 3 กิจกรรม เท่านั้น นั่นคือ เข้าไปดูเนื้อหาในหลักสูตร (\textbf{access}), 
+    ทำแบบทดสอบ (\textbf{problem}) และ ดูวีดีโอ (\textbf{video}) 
+    โดยแยกเป็นกลุ่มได้ดังตารางที่ \ref{tab:activities-details}
 
-    \section[result]{ผลลัพธ์การดำเนินงาน}
-    lorem ipsum
+    \begin{table}[ht!]
+        \caption[activitiesinfo]{กิจกรรมของผู้เรียน}
+        \label{tab:activities-details}
+        \begin{tabular}{p{1.3cm} p{1.5cm} p{1.5cm} p{1.5cm}}
+            \hline
+            \thead{กิจกรรม} & \thead{จำนวนกิจกรรมทั้งหมด}   & \thead{ผู้เรียนปรกติ} & \thead{ผู้เรียนที่{\dropout}} \\
+            \hline
+            \textit{เข้าศึกษาเนื้อหา}   & 3,060,180 & 1,896,876   & 1,163,304 \\
+            \textit{ทำแบบฝึกหัด}     & 1,429,012 & 944,496     & 484,516 \\
+            \textit{ดูวีดีโอ}          & 766,699 & 454,067     & 312,632 \\
+            \hline
+        \end{tabular}
+    \end{table}
+
+    % MATCH (:Enrollment {learning_status: "dropout"})--(e:Event)--()-[:PART_OF]-(c:Course)
+    % RETURN c.course_id AS course_id, count(e) AS number_of_event
+    % ORDER BY number_of_event DESC;
+
+    เมื่อค้นหาหลักสูตรที่มีผู้เรียน{\dropout}มากที่สุด วิชารหัส \textbf{DPnLzkJJqOOPRJfBxIHbQEERiYHu5ila} 
+    ที่มีผู้เรียน{\dropout}ไปมากถึงกว่า 87,653 ครั้ง ดังที่แสดงไว้ในตารางที่ \ref{tab:most-dropout-number} 
+    ที่แสดง 10 วิชาที่ผู้เรียน{\dropout}ไปมากที่สุด
+
+    \begin{table}[ht!]
+        \caption[activitiesinfo]{รายวิชาที่มีผู้เรียน{\dropout}มากที่สุด 10 ลำดับแรกจากทั้งสิ้น 36 รายวิชา}
+        \label{tab:most-dropout-number}
+        \begin{tabular}{p{4.5cm} p{2cm}}
+            \hline
+            \thead{รหัสบทเรียน} & \thead{จำนวนผู้เรียนที่{\dropout}} \\
+            \hline
+            DPnLzkJJqOOPRJfBxIHbQEERiYHu5ila	& 87,653 \\
+            I7Go4XwWgpjRJM8EZGEnBpkfSmBNOlsO	& 86,161 \\
+            shM3Yy9vxHn2aqjSYfQXOcwGo0hWh3MI	& 65,276 \\
+            H2lDW05SyKnwntZ6Fora76aPAEswcMa5	& 62,336 \\
+            9Bd26pfDLvkPINwLnpaGcf0LrLUvY1Mz	& 45,063 \\
+            AXUJZGmZ0xaYSWazu8RQ1G5c76ECT1Kd	& 42,333 \\
+            SpATywNh6bZuzm8s1ceuBUnMUAeoAHHw	& 42,060 \\
+            nSfGxfEtzw5G72fVbfaowxsV46Pg1xIc	& 38,754 \\
+            V4tXq15GxHo2gaMpaJLZ3IGEkP949IbE	& 38,423 \\
+            Er0RFawC4sHagDmmQZcBGBrzamLQcblZ	& 35,945 \\
+            \hline
+        \end{tabular}
+    \end{table}
+
+    หลังจากนั้นศึกษาโครงสร้างของรายวิชารหัส \textbf{DPnLzkJJqOOPRJfBxIHbQEERiYHu5ila}
+    พบว่าโครงสร้างหลักสูตรนั้นมีเนื้อจำนวนมาก ดังที่แสดงไว้ในรูปที่ \ref{fig:most-dropout-course}
+
+    % MATCH (c:Course {course_id: "DPnLzkJJqOOPRJfBxIHbQEERiYHu5ila"})-[:PART_OF]-(n)-[:PART_OF]-(m)
+    % WHERE labels(n)[0] IN ["Module", "ModuleObject"]
+    %     OR labels(m)[0] = "ModuleObject"
+    % RETURN c, m, n
+    \begin{figure}[htbp]
+        \centering{
+            \includegraphics[width=0.45\textwidth]{assets/most-dropout-course}
+        }
+        \caption{โครงสร้างบทเรียนรหัส \textbf{DPnLzkJJqOOPRJfBxIHbQEERiYHu5ila} ที่มีผู้เรียน{\dropout}มากที่สุด}
+        \label{fig:most-dropout-course}
+    \end{figure}
+
+
+    จากตารางที่ \ref{tab:activities-details} ทำให้ทราบได้ว่า
+    กิจกรรมส่วนใหญ่ของผู้เรียนใน{\MOOCs}คือ {\textbf{การเข้าศึกษาเนื้อหา}} เป็นส่วนใหญ่
+    โดยที่จำนวนการการเข้าศึกษาเนื้อหาหลักสูตรนั้นแทบไม่แตกต่างกัน ในผู้เรียนทั้ง 2 กลุ่ม 
+    ทั้งที่ อัตราการ{\dropout}ของการลงทะเบียนนั้นคิดเป็น 79.24\% ของจำนวนการลงทะเบียนทั้งหมด
+    แต่ในทางกลับกัน ผู้เรียนในกลุ่มปรกตินั้น มีจำนวน{\textbf{การทำแบบฝึกหัด}} คือ 944,496 ครั้ง 
+    จากการกิจกรรมการทำแบบฝึกหัดที่เกิดขึ้นทั้งหมด 1,429,012 ครั้ง หรือคิดเป็น 66.09\% 
+    ส่วนผู้เรียนในกลุ่มที่{\dropout}นั้น มีกิจกรรมในกลุ่ม{\textbf{ทำแบบฝึกหัด}}เพียง 494,516 ครั้ง 
+    คิดเป็น 33.91\% ดังที่แสดงไว้ในรูปที่ \ref{fig:problem-norm-dropout}
+
+    \begin{figure}[ht!]
+        \begin{tikzpicture}
+            \pie{66.09/ผู้เรียนปรกติ, 33.91/ผู้เรียนที่{\dropout}}
+        \end{tikzpicture}
+        \caption{อัตราส่วนของการทำแบบทดสอบเปรียบเทียบกันระหว่างผู้เรียนปรกติและผู้เรียนที่{\dropout}}
+        \label{fig:problem-norm-dropout}
+    \end{figure}
+
+    นอกจากนั้นแล้ว ยังพบอีกว่าหากพิจารณาในการดูวีดีโอนั่นจะพบว่า 
+    อัตราส่วนของการดูวีดีโอของผู้เรียนในกลุ่มปรกติและกลุ่มที่{\dropout} นั้นคือ 59.22\% และ 40.78\%
+    ยังคงแตกต่างกันกันมากเช่นเดียวกันกับอัตรส่วนการทำแบบทดสอบ ดังที่แสดงไว้ในรูปที่ \ref{fig:video-norm-dropout}
+
+    \begin{figure}[ht!]
+        \begin{tikzpicture}
+            \pie{59.22/ผู้เรียนปรกติ, 40.78/ผู้เรียนที่{\dropout}}
+        \end{tikzpicture}
+        \caption{อัตราส่วนของการดูวีดีโอเปรียบเทียบกันระหว่างผู้เรียนปรกติและผู้เรียนที่{\dropout}}
+        \label{fig:video-norm-dropout}
+    \end{figure}
+    
+    \begin{figure}[ht!]
+        \begin{tikzpicture}[line cap=rect]
+            \begin{axis}[
+                ybar stacked,
+                bar width=0.8,
+                ylabel = จำนวนกิจกรรม,
+                xtick={0, 1, 2},
+                xticklabels={ศึกษาเนื้อหา,ทำแบบฝึกหัด,ดูวีดีโอ},
+            ]
+                \addplot coordinates { (0, 1896876) (1, 944496) (2, 454067) };
+                \addplot coordinates { (0, 1163304) (1, 484516) (2, 312632) };
+                \legend{ผู้เรียนปรกติ,ผู้เรียนที่{\dropout}}
+            \end{axis}
+        \end{tikzpicture}
+        \caption{แผนภาพเทียบอัตราส่วนระหว่างผู้เรียนปรกติและผู้เรียนที่{\dropout}}
+        \label{fig:normalvsdropout}
+    \end{figure}
+
+    หลังจากนั้นได้ใช้ Louvain เพื่อวิเคราะห์หากลุ่มในกราฟ โดยมีสมการคือ 
+    \[
+       M = \frac{1}{2m}\sum_{i,j}(A_{ij}-p_{ij})\delta(c_i, c_j)
+    \]
+
+    โดยที่ $A_{ij}$ คือ Adjacency matrix ที่เป็นตัวแทนของน้ำหนักในเส้น
+    เพื่อใช้ค้นหา Community ที่โหนดตำแหน่ง $i$ และ $j$, $k_i = \sum{j A_{ij}}$ 
+    เป็นดีกรีของโหนด $i$, $c_i$ คือ Community ที่อยู่บนฟังก์ชัน $\delta$ คือ 
+    $\delta(u, v)$ ซึ่งจะมีค่าเป็น 1 หาก $u = v$ และ 0 ในการณีอื่นๆ โดยในการทำงานนี้จะใช้การคำนวณผ่าน 
+    โมดูลชื่อ Graph Data Science ของ Neo4j โดยตรวจจับลักษณะของความเป็นกลุ่มก้นด้วยการเลือกที่เมนู
+    LOUVAIN ที่กลุ่ม Community Detection โดยตรวจสอบจากโหนด \textbf{Event} 
+    ซึ่งเป็นตัวแทนในยังกลุ่มเนื้อหาของหลักสูตร และกำหนด Relationship Oriantation เป็น \textbf{Undirected}
+    และ Community Nodes Limit เป็น 100 Node ซึ่งการทำเช่นนี้โปรแกรมจะตรวจสอบ Community
+    ให้ทั้งผู้เรียนปรกติและผู้เรียนที่{\dropout} โดยพบชุดพฤติกรรมของผู้เรียนที่{\dropout} 
+    ดังแสดงในรูปที่ \ref{fig:dropout-community}
+
+    \begin{figure}[htbp]
+        \centering{
+            \includegraphics[width=0.45\textwidth]{assets/dropout-patterns}
+        }
+        \caption{กลุ่มพฤติกรรมของผู้เรียนที่{\dropout}}
+        \label{fig:dropout-community}
+    \end{figure}
 
     \section[conclusions]{สรุปผลการศึกษา}
-    lorem ipsum
+    จากรูปแบบพฤติกรรมของผู้เรียนที่มีพฤติกรรม{\dropout}ไปในรูปที่ \ref{fig:dropout-community}
+    พบว่า ผู้เรียนได้ศึกษาเนื้อหาตามที่บทเรียนกำหนดไว้ตามปรกติ แต่มักจะเจอกับแบบทดสอบที่ติดต่อกันเป็นจำนวนมาก
+    ทั้งนี้เป็นไปได้ทั้งการทำแบบทดสอบซ้ำๆ กันหลายครั้งติดต่อกัน ซึ่งเป็นข้อสังเกตได้ว่า 
+    หากผู้เรียนทำแบบทดสอบติดต่อกันเป็นจำนวนมาก หรือทำแบบทดสอบซ้ำกันต่อเนื่อง
+    ซึ่งอาจแสดงให้เห็นว่าผู้เรียนไม่เข้าใจเนื้อหาของหลักสูตรเท่าที่ควร 
+    ส่งผลให้เกิดการยุติการเรียนกลางคันไปในที่สุด
 
     \bibliographystyle{IEEEtran}
     \bibliography{sna-ref}
